@@ -1,7 +1,11 @@
 ---
 name: doc-coauthoring
-description: "문서 작성, 문서화, 문서, 스펙 작성, 기술 문서, 제안서, RFC, 설계 문서, 의사결정 문서 - Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content."
-allowed-tools: Read, Write, Edit, Grep, Glob
+description: "문서 작성, 문서화, 문서, 스펙 작성, 기술 문서, 제안서, RFC, 설계 문서, 의사결정 문서 - Collaborative document co-authoring through 3 stages: context gathering, iterative refinement, and reader testing. Use when writing docs, proposals, tech specs, decision docs, or RFCs. Do NOT use for PRD/product requirements (use prd-strategist) or implementation plans (use writing-plans)."
+tools: Read, Write, Edit, Grep, Glob
+model: opus
+metadata:
+  author: jaehashin
+  version: 1.2.0
 ---
 
 # Doc Co-Authoring Workflow
@@ -50,3 +54,13 @@ For each section:
 
 For complete stage instructions, tips, and handling edge cases:
 **Read `REFERENCE.md` in this skill directory when needed.**
+
+## Completion
+
+Stage 3 Reader Testing을 통과하고 최종 문서가 사용자 승인을 받으면 완료.
+
+## Troubleshooting
+
+**User dumps a wall of text with no structure**: Start Stage 1 — ask meta-context questions to organize their input into sections before attempting to structure.
+**User wants to skip straight to writing**: Confirm they have audience and purpose clear. If yes, jump to Stage 2 with their existing outline. If no, brief Stage 1.
+**Reader testing reveals fundamental gaps**: Don't patch — return to Stage 2 for the affected section. Rewrite based on new understanding.

@@ -1,8 +1,11 @@
 ---
 name: e2e-runner
-description: "E2E 테스트, Playwright, 엔드투엔드, 통합 테스트, UI 테스트 - End-to-end testing workflow using Playwright. Generates, runs, and maintains E2E tests for web applications."
+description: "E2E 테스트, Playwright, 엔드투엔드, 통합 테스트, UI 테스트 - Generates, runs, and maintains E2E tests using Playwright. Use when creating browser-based tests, debugging flaky E2E tests, or maintaining Playwright test suites. Do NOT use for unit/integration tests (use tdd-workflow) or test strategy planning (use testing-strategy)."
 tools: Read, Write, Edit, Bash, Grep, Glob
 model: opus
+metadata:
+  author: jaehashin
+  version: 1.2.0
 ---
 
 # E2E Runner
@@ -24,7 +27,6 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Feature: [기능명]', () => {
   test.beforeEach(async ({ page }) => {
-    // 공통 설정
     await page.goto('/');
   });
 
@@ -36,44 +38,13 @@ test.describe('Feature: [기능명]', () => {
 });
 ```
 
-### 사용자 시나리오 예시
-```typescript
-test.describe('User Authentication', () => {
-  test('should login successfully with valid credentials', async ({ page }) => {
-    // Navigate to login page
-    await page.goto('/login');
-    
-    // Fill in credentials
-    await page.fill('[data-testid="email"]', 'user@example.com');
-    await page.fill('[data-testid="password"]', 'password123');
-    
-    // Submit form
-    await page.click('[data-testid="login-button"]');
-    
-    // Verify successful login
-    await expect(page).toHaveURL('/dashboard');
-    await expect(page.locator('[data-testid="welcome-message"]')).toBeVisible();
-  });
-
-  test('should show error for invalid credentials', async ({ page }) => {
-    await page.goto('/login');
-    await page.fill('[data-testid="email"]', 'invalid@example.com');
-    await page.fill('[data-testid="password"]', 'wrongpassword');
-    await page.click('[data-testid="login-button"]');
-    
-    await expect(page.locator('[data-testid="error-message"]')).toContainText('Invalid credentials');
-  });
-});
-```
-
 ## 테스트 생성 프로세스
 
 ### Phase 1: 시나리오 정의
 ```
 사용자 스토리 → 테스트 시나리오 변환
 
-예:
-"사용자가 로그인할 수 있다"
+예: "사용자가 로그인할 수 있다"
 → 
 1. 유효한 자격 증명으로 로그인 성공
 2. 잘못된 비밀번호로 로그인 실패
@@ -98,124 +69,6 @@ AAA 패턴:
 - Assert: 결과 검증
 ```
 
-## Playwright 설정
-
-### playwright.config.ts
-```typescript
-import { defineConfig, devices } from '@playwright/test';
-
-export default defineConfig({
-  testDir: './e2e',
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: [
-    ['html'],
-    ['json', { outputFile: 'test-results.json' }]
-  ],
-  use: {
-    baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-  },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-  ],
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
-});
-```
-
-## 테스트 실행 명령어
-
-### 기본 실행
-```bash
-# 모든 테스트 실행
-npx playwright test
-
-# 특정 파일 실행
-npx playwright test e2e/login.spec.ts
-
-# 특정 브라우저
-npx playwright test --project=chromium
-
-# UI 모드
-npx playwright test --ui
-
-# 헤드리스 모드 비활성화
-npx playwright test --headed
-```
-
-### 디버깅
-```bash
-# 디버그 모드
-npx playwright test --debug
-
-# 트레이스 뷰어
-npx playwright show-trace trace.zip
-```
-
-### 리포트
-```bash
-# HTML 리포트 열기
-npx playwright show-report
-```
-
-## 자주 사용하는 패턴
-
-### 페이지 네비게이션
-```typescript
-await page.goto('/dashboard');
-await page.waitForURL('**/dashboard');
-```
-
-### 요소 대기
-```typescript
-await page.waitForSelector('[data-testid="loading"]', { state: 'hidden' });
-await expect(page.locator('[data-testid="content"]')).toBeVisible();
-```
-
-### 폼 입력
-```typescript
-await page.fill('input[name="email"]', 'test@example.com');
-await page.selectOption('select[name="country"]', 'KR');
-await page.check('input[type="checkbox"]');
-```
-
-### API 모킹
-```typescript
-await page.route('**/api/users', async route => {
-  await route.fulfill({
-    status: 200,
-    body: JSON.stringify([{ id: 1, name: 'Test User' }]),
-  });
-});
-```
-
-### 스크린샷
-```typescript
-await page.screenshot({ path: 'screenshot.png', fullPage: true });
-```
-
 ## 테스트 유지보수
 
 ### 깨진 테스트 수정
@@ -227,26 +80,15 @@ await page.screenshot({ path: 'screenshot.png', fullPage: true });
 5. 테스트 수정 또는 기능 버그 보고
 ```
 
-### Flaky 테스트 처리
-```typescript
-// 재시도 추가
-test('flaky test', async ({ page }) => {
-  test.retry(2);
-  // ...
-});
+## Playwright 상세 참조
 
-// 명시적 대기 추가
-await page.waitForLoadState('networkidle');
-```
+Playwright 설정, 실행 명령어, 코드 패턴, Page Object 패턴, 테스트 구조 등 상세 참조:
+**Read `references/playwright-reference.md` in this skill directory.**
 
 ## 사용 방법
 
 ### 테스트 생성 요청
 ```
-/e2e
-
-또는
-
 로그인 기능에 대한 E2E 테스트를 생성해주세요.
 ```
 
@@ -262,56 +104,16 @@ E2E 테스트를 실행하고 실패한 테스트를 분석해주세요.
 [에러 메시지]
 ```
 
-## 테스트 구조 예시
+## 문서화 (작업 완료 후 자동 실행)
 
-```
-e2e/
-├── fixtures/
-│   ├── test-data.json
-│   └── auth.setup.ts
-├── pages/
-│   ├── login.page.ts
-│   └── dashboard.page.ts
-├── tests/
-│   ├── auth/
-│   │   ├── login.spec.ts
-│   │   └── logout.spec.ts
-│   ├── dashboard/
-│   │   └── overview.spec.ts
-│   └── settings/
-│       └── profile.spec.ts
-└── playwright.config.ts
-```
+작업 완료 시 `auto-documenter`를 호출하여 프로젝트 문서를 업데이트한다.
 
-## Page Object 패턴
+## Completion
 
-```typescript
-// pages/login.page.ts
-import { Page, Locator } from '@playwright/test';
+모든 대상 테스트가 통과하거나, 실패 원인 분석 리포트가 전달되면 완료.
 
-export class LoginPage {
-  readonly page: Page;
-  readonly emailInput: Locator;
-  readonly passwordInput: Locator;
-  readonly loginButton: Locator;
-  readonly errorMessage: Locator;
+## Troubleshooting
 
-  constructor(page: Page) {
-    this.page = page;
-    this.emailInput = page.locator('[data-testid="email"]');
-    this.passwordInput = page.locator('[data-testid="password"]');
-    this.loginButton = page.locator('[data-testid="login-button"]');
-    this.errorMessage = page.locator('[data-testid="error-message"]');
-  }
-
-  async goto() {
-    await this.page.goto('/login');
-  }
-
-  async login(email: string, password: string) {
-    await this.emailInput.fill(email);
-    await this.passwordInput.fill(password);
-    await this.loginButton.click();
-  }
-}
-```
+**테스트가 간헐적으로 실패 (flaky)**: 타이밍 이슈가 대부분. `waitFor` / `expect().toBeVisible()` 등 명시적 대기로 교체. `page.waitForTimeout()` 사용 금지.
+**Selector가 자주 깨지는 경우**: CSS selector 대신 `data-testid` 또는 `role + name` 선택자로 전환. 선택자 우선순위 Phase 2 참조.
+**CI에서만 실패하는 테스트**: headless 모드 차이, 화면 해상도, 네트워크 지연 확인. `--trace on`으로 trace 수집 후 분석.

@@ -1,6 +1,11 @@
 ---
 name: code-conventions
-description: "코드 컨벤션, 코딩 스타일, 코드 스타일, 네이밍, 컨벤션, 타입스크립트, 파이썬, 자바, 함수 크기, 파일 크기 - Always apply when writing code. Code style, naming rules, function/file size limits for TypeScript, Python, and Java."
+description: "코드 컨벤션, 코딩 스타일, 코드 스타일, 네이밍, 컨벤션, 타입스크립트, 파이썬, 자바, 함수 크기, 파일 크기 - Code style reference for TypeScript, Python, and Java. Provides naming rules, function/file size limits, and formatting conventions. Use when writing or reviewing code style. Do NOT use as primary skill for code reviews (use code-reviewer) or refactoring (use refactor-cleaner)."
+tools: Read, Grep, Glob
+model: opus
+metadata:
+  author: jaehashin
+  version: 1.2.0
 ---
 
 # Code Conventions - Code Style Persona
@@ -154,3 +159,13 @@ from myapp import utils
 - **Callback Hell / Nested Conditionals**: Deep nesting
 - **Copy-Paste Code**: Duplicated code
 - **Generic Naming**: utils, helpers, common, shared, misc
+
+## Completion
+
+레퍼런스 Skill이므로 독립적 완료 조건 없음. 다른 Skill(code-reviewer, refactor-cleaner)이 참조하여 사용.
+
+## Troubleshooting
+
+**Project uses conventions different from this skill**: Project-level CLAUDE.md or .editorconfig takes precedence. This skill provides defaults when no project convention exists.
+**Naming conflict between languages**: Each language section is independent. Python uses snake_case, TypeScript uses camelCase — don't mix across language boundaries.
+**Linter rules conflict with these conventions**: Linter config is authoritative. Update this skill’s guidance in project CLAUDE.md if persistent conflicts arise.

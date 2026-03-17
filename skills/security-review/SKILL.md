@@ -1,8 +1,11 @@
 ---
 name: security-review
-description: "보안, 보안 리뷰, 보안 검토, 취약점, 보안 분석, OWASP, 인증, 인가, 취약점 점검 - Use when reviewing code for security vulnerabilities, designing authentication/authorization, or ensuring secure architecture. Provides systematic security analysis based on OWASP guidelines."
-tools: Read, Write, Grep, Glob, Bash, WebSearch
+description: "보안, 보안 리뷰, 보안 검토, 취약점, 보안 분석, OWASP, 인증, 인가, 취약점 점검 - Systematic security analysis based on OWASP Top 10. Reviews code for vulnerabilities, designs auth/authz systems, and produces severity-classified reports. Use when auditing security, designing authentication, or pre-deployment security checks. Do NOT use for general code quality reviews (use code-reviewer) or debugging (use debug-specialist)."
+tools: Read, Grep, Glob, WebSearch
 model: opus
+metadata:
+  author: jaehashin
+  version: 1.2.0
 ---
 
 # Security Review Skill
@@ -79,3 +82,13 @@ Provide recommendations for:
 
 For OWASP checklist, vulnerable code patterns, search queries, and report templates:
 **Read `OWASP-CHECKLIST.md` in this skill directory.**
+
+## Completion
+
+취약점 리포트(Severity 분류 + 권고 사항)가 전달되면 완료.
+
+## Troubleshooting
+
+**Too many findings to prioritize**: Focus on Critical/High first. If >20 Critical findings, the codebase likely needs a dedicated security sprint rather than a review.
+**False positives from pattern matching**: Verify each finding with actual data flow analysis. A SQL query using parameterized binding is safe even if grep finds `SELECT` near user input.
+**Team pushes back on security fixes**: Quantify risk with severity + exploitability. "This allows unauthenticated admin access" is more actionable than "A01 violation found."
