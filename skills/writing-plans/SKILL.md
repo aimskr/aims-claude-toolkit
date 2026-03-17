@@ -1,7 +1,11 @@
 ---
 name: writing-plans
-description: "계획, 구현 계획, 플랜 작성, 작업 계획, 구현 플랜, 플랜 저장, TODO 저장, 계획 캡처, plan 저장, 플랜 캡처 - Use when you have a spec or requirements for a multi-step task, before touching code. Also captures Plan mode output to structured markdown files."
-allowed-tools: Read, Write, Grep, Glob
+description: "계획, 구현 계획, 플랜 작성, 작업 계획, 구현 플랜, 플랜 저장, TODO 저장, 계획 캡처, plan 저장, 플랜 캡처 - Creates detailed implementation plans with bite-sized tasks and TDD steps. Also captures Plan mode output to structured markdown. Use when planning multi-step implementations before coding, or saving Plan mode output. Do NOT use for brainstorming (use brainstorming) or PRD/product strategy (use prd-strategist)."
+tools: Read, Write, Grep, Glob
+model: opus
+metadata:
+  author: jaehashin
+  version: 1.2.0
 ---
 
 # Writing Plans
@@ -16,7 +20,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
-**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`
+**Save plans to:** `docs/plans/NNNN.YYYY-MM-DD-<feature-name>.md` (NNNN: 해당 폴더 내 최대 번호 + 1, 없으면 0001)
 
 ## Bite-Sized Task Granularity
 
@@ -41,6 +45,19 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 **Architecture:** [2-3 sentences about approach]
 
 **Tech Stack:** [Key technologies/libraries]
+
+**Constraints:**
+- Technical: [기술 스택/인프라/호환성 제약]
+- Resource: [시간/인원/예산/환경 제약]
+- Business: [법적/규제/계약/정책 제약]
+- Scope: [하지 않을 것, 범위 외]
+
+**Business Rules:**
+| Rule | Rationale (근거) | Source (출처) |
+|------|-------------------|---------------|
+| [도메인 규칙] | [왜 이렇게 결정했는가] | [출처] |
+
+> 상위 문서(brainstorming design / PRD)에서 Constraints와 Business Rules를 인계받아 기재한다. 상위 문서가 없으면 사용자에게 직접 확인한다.
 
 ---
 ```
@@ -87,6 +104,17 @@ git add tests/path/test.py src/path/file.py
 git commit -m "feat: add specific feature"
 ```
 ```
+
+## Plan Sanity Check (Devil's Advocate)
+
+플랜을 파일에 저장하기 직전, 아래 3가지를 자가 점검하고 결과를 사용자에게 공유:
+
+1. **순서 공격**: "Task 순서를 뒤집거나 병합하면 더 효율적이지 않은가?"
+2. **누락 점검**: "가장 간과하기 쉬운 엣지 케이스 또는 의존성은?"
+3. **복잡도 공격**: "이 계획이 과도하게 복잡하지 않은가? Task 수를 절반으로 줄일 수 있는가?"
+
+> 계획 단계에서 발견하면 코스트 1, 구현 중 발견하면 코스트 10.
+> 점검 결과 문제가 있으면 수정 후 저장. 문제 없으면 그대로 진행.
 
 ## Remember
 - Exact file paths always
@@ -185,7 +213,7 @@ docs/plans/<feature>/
 
 Single file with sequential checklist:
 
-**Location:** `docs/plans/YYYY-MM-DD-HHmm-<feature>.md`
+**Location:** `docs/plans/NNNN.YYYY-MM-DD-HHmm-<feature>.md`
 
 ```markdown
 # [Feature Name] Implementation Plan
@@ -264,3 +292,13 @@ After saving the plan, offer execution choice:
 **If Parallel Session chosen:**
 - Guide them to open new session in worktree
 - **REQUIRED SUB-SKILL:** New session uses superpowers:executing-plans
+
+## Completion
+
+플랜이 `docs/plans/`에 저장되고 실행 방식(Subagent-Driven / Parallel Session)이 선택되면 완료.
+
+## Troubleshooting
+
+**Plan tasks are too large (>5 minutes each)**: Split further. Each step should be one action: write test, run test, implement, commit. If a step has "and", it's two steps.
+**User's Plan mode output is unstructured**: Extract TODO items manually. Look for numbered lists, bullet points, or action verbs. Ask user to confirm the extracted task list before saving.
+**Plan becomes outdated during implementation**: Plans are living documents. Update the plan file as decisions change. Add a "Changes from original plan" section at the bottom.

@@ -1,0 +1,113 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "includeCoAuthoredBy": true,
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(tree:*)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "Read(*)"
+    ],
+    "deny": [],
+    "defaultMode": "acceptEdits"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "tool == 'Bash' && tool_input.command matches 'rm -rf /'",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'BLOCKED: Dangerous rm -rf / detected' >&2; exit 2"
+          }
+        ]
+      },
+      {
+        "matcher": "tool == 'Bash' && tool_input.command matches 'git push.*--force'",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'BLOCKED: Force push requires explicit user request' >&2; exit 2"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/hooks/git-branch-protect.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/hooks/ruff-post-write.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/hooks/eslint-post-write.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/hooks/java-format-post-write.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/hooks/notify.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash -c '\"$HOME/.bun/bin/bun\" \"$(ls -td ~/.claude/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null | head -1)src/index.ts\"'"
+  },
+  "enabledPlugins": {
+    "unit-testing@claude-code-workflows": false,
+    "claude-hud@claude-hud": true,
+    "swift-lsp@claude-plugins-official": true,
+    "jdtls-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true
+  },
+  "language": "Korean",
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
+  "ignoreProjectConfig": true,
+  "mcpServers": {},
+  "teammateMode": "auto",
+  "verbose": true
+}

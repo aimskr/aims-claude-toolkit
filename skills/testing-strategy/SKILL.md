@@ -1,8 +1,11 @@
 ---
 name: testing-strategy
-description: "테스트, 테스팅, QA, 테스트 전략, 품질 보증, 유닛 테스트, 통합 테스트, E2E, 테스트 커버리지 - Use when designing test strategies, writing test plans, or ensuring quality assurance. Guides systematic testing approach from unit to E2E with proper coverage and scenario design."
-tools: Read, Write, Bash, Grep, Glob
+description: "테스트 전략, 테스팅 계획, QA 전략, 품질 보증, 테스트 피라미드, 테스트 시나리오, 커버리지 목표 - Designs test strategies including test pyramid ratios, scenario categories, and coverage targets. Use when planning how to test a feature, designing QA approach, or creating test plans. Do NOT use for TDD implementation (use tdd-workflow) or E2E test execution (use e2e-runner)."
+tools: Read, Grep, Glob
 model: opus
+metadata:
+  author: jaehashin
+  version: 1.2.0
 ---
 
 # Testing Strategy Skill
@@ -15,6 +18,29 @@ Provides a systematic workflow for test strategy planning and quality assurance.
 - Improving test coverage
 - Creating QA checklists
 - Designing test scenarios
+
+## Stack Detection (Auto)
+
+Before designing strategy, detect the project's test stack:
+
+```
+1. Check package.json → Jest/Vitest/Mocha/Playwright/Cypress
+2. Check requirements.txt/pyproject.toml → pytest/unittest
+3. Check build.gradle/pom.xml → JUnit/TestNG/Mockito
+4. Check CI config (.github/workflows, Jenkinsfile) → existing test stages
+5. Check existing test files → patterns already in use
+```
+
+**Auto-select test tools based on detection:**
+
+| Stack | Unit | Integration | E2E |
+|-------|------|-------------|-----|
+| TypeScript/Node | Jest or Vitest | Supertest | Playwright |
+| Python/FastAPI | pytest | pytest + httpx | Playwright |
+| Java/Spring Boot | JUnit 5 | Spring Boot Test | Selenium/Playwright |
+| React/Next.js | Vitest + RTL | MSW | Playwright/Cypress |
+
+If no test infrastructure exists, recommend setup based on detected stack before proceeding to strategy design.
 
 ## The Process
 
@@ -159,3 +185,13 @@ High coverage ≠ Good tests
 3. **Clear Failure**: Cause should be immediately apparent on failure
 4. **Maintainability**: Manage test code like production code
 5. **Appropriate Level**: Meaningful tests over 100% coverage
+
+## Completion
+
+테스트 전략 문서가 생성되고 사용자가 승인하면 완료.
+
+## Troubleshooting
+
+**Coverage is high but bugs still slip through**: Coverage measures lines executed, not behavior verified. Audit assertions — tests with no meaningful assertions inflate coverage without catching bugs.
+**Test pyramid ratio is wrong (too many E2E)**: Identify E2E tests that test only one module’s logic and convert to unit/integration tests. Reserve E2E for cross-module critical paths only.
+**Flaky tests blocking CI**: Quarantine flaky tests immediately (move to separate suite). Fix root cause (timing, order dependency, external state) before restoring to main suite.
